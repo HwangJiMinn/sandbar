@@ -1,0 +1,10 @@
+{
+  "meta": {
+    "title": "React Router",
+    "description": "React Router is a modern web application framework for React."
+  },
+  "word": {
+    "theme": "theme",
+    "language": "language"
+  }
+}

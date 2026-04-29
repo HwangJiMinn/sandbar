@@ -1,0 +1,24 @@
+# compiled output
+/.cache
+/node_modules
+/build
+.eslintcache
+
+# OS
+.DS_Store
+
+# dotenv environment variable files
+.env
+.env.local
+
+# React Router
+/.react-router/
+
+# yarn berry
+.yarn/*
+!.yarn/cache
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
