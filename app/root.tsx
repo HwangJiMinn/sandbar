@@ -11,16 +11,12 @@ import {
   ScrollRestoration,
 } from 'react-router';
 
-import { getLanguageSession, getThemeSession } from './.server/services/session.service';
+import { getLanguageSession } from './.server/services/session.service';
 import type { Route } from './+types/root';
-import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from './hooks/use-theme';
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const [{ getLanguage }, { getTheme }] = await Promise.all([
-    getLanguageSession(request),
-    getThemeSession(request),
-  ]);
-  return { lang: getLanguage(), ssrTheme: getTheme() };
+  const { getLanguage } = await getLanguageSession(request);
+  return { lang: getLanguage() };
 };
 
 export const links: LinksFunction = () => {
@@ -38,16 +34,16 @@ export const links: LinksFunction = () => {
   ];
 };
 
-export const App = ({ lang, ssrTheme }: Route.ComponentProps['loaderData']) => {
-  const [theme] = useTheme();
+export default function App({ loaderData }: Route.ComponentProps) {
+  const { lang } = loaderData;
 
   return (
-    <html lang={lang} className={theme ?? ''}>
+    <html lang={lang} className="dark">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="color-scheme" content="dark" />
         <Meta />
-        <PreventFlashOnWrongTheme ssrTheme={Boolean(ssrTheme)} />
         <Links />
       </head>
       <body>
@@ -58,16 +54,6 @@ export const App = ({ lang, ssrTheme }: Route.ComponentProps['loaderData']) => {
         <Scripts />
       </body>
     </html>
-  );
-};
-
-export default function AppWithProviders({ loaderData }: Route.ComponentProps) {
-  const { ssrTheme } = loaderData;
-
-  return (
-    <ThemeProvider specifiedTheme={ssrTheme} themeAction="/api/theme">
-      <App {...loaderData} />
-    </ThemeProvider>
   );
 }
 
@@ -88,14 +74,26 @@ export const ErrorBoundary = ({ error }: Route.ErrorBoundaryProps) => {
   }
 
   return (
-    <main className="container mx-auto p-4 pt-16">
-      <h1>{message}</h1>
-      <p>{details}</p>
-      {stack && (
-        <pre className="w-full overflow-x-auto p-4">
-          <code>{stack}</code>
-        </pre>
-      )}
-    </main>
+    <html lang="ko" className="dark">
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="color-scheme" content="dark" />
+        <Meta />
+        <Links />
+      </head>
+      <body>
+        <main className="container mx-auto p-4 pt-16">
+          <h1>{message}</h1>
+          <p>{details}</p>
+          {stack && (
+            <pre className="w-full overflow-x-auto p-4">
+              <code>{stack}</code>
+            </pre>
+          )}
+        </main>
+        <Scripts />
+      </body>
+    </html>
   );
 };

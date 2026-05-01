@@ -1,9 +1,57 @@
-import { createCookieSessionStorage } from 'react-router';
+import { createCookieSessionStorage, redirect } from 'react-router';
 
 import { getAcceptLanguage } from '~/.server/lib/localization';
 import { Theme } from '~/common/constants';
 import { isLanguage } from '~/hooks/use-language';
 import { isTheme } from '~/hooks/use-theme';
+
+// ─── 인증 세션 ─────────────────────────────────────────────
+
+const authStorage = createCookieSessionStorage({
+  cookie: {
+    name: 'auth',
+    secure: process.env.NODE_ENV === 'production',
+    secrets: [process.env.SESSION_SECRET ?? 'fallback-secret'],
+    sameSite: 'lax',
+    path: '/',
+    httpOnly: true,
+    maxAge: 60 * 60 * 24 * 30, // 30일
+  },
+});
+
+export interface AuthSessionUser {
+  id: string;
+  email: string;
+  name: string;
+}
+
+export const getAuthSession = async (request: Request) => {
+  const session = await authStorage.getSession(request.headers.get('Cookie'));
+  return {
+    getUser: (): AuthSessionUser | null => {
+      const user = session.get('user');
+      return user ?? null;
+    },
+    setUser: (user: AuthSessionUser) => session.set('user', user),
+    destroy: () => authStorage.destroySession(session),
+    commit: () => authStorage.commitSession(session),
+  };
+};
+
+// * 로그인된 유저 가져오기 (없으면 null)
+export const getSessionUser = async (
+  request: Request,
+): Promise<AuthSessionUser | null> => {
+  const authSession = await getAuthSession(request);
+  return authSession.getUser();
+};
+
+// * 로그인 필요 페이지에서 사용 — 미인증 시 /login으로 리다이렉트
+export const requireAuth = async (request: Request): Promise<AuthSessionUser> => {
+  const user = await getSessionUser(request);
+  if (!user) throw redirect('/login');
+  return user;
+};
 
 // * 언어 세션
 export const getLanguageSession = async (request: Request) => {

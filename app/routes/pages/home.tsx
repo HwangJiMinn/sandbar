@@ -1,68 +1,32 @@
-import { type LoaderFunctionArgs, type MetaFunction, useLoaderData } from 'react-router';
+import { type MetaFunction } from 'react-router';
 
-import { localize } from '~/.server/lib/localization';
-import { Language, Theme } from '~/common/constants';
-import LogoDark from '~/components/svg/logo-dark.svg?react';
-import LogoLight from '~/components/svg/logo-light.svg?react';
-import { Button } from '~/components/ui/button';
-import { useLanguage } from '~/hooks/use-language';
-import { useTheme } from '~/hooks/use-theme';
+import { AiBanner } from '~/components/home/ai-banner';
+import { AiSajuBanner } from '~/components/home/ai-saju-banner';
+import { ContentSection } from '~/components/home/content-section';
+import { Hero } from '~/components/home/hero';
+import { QuickMenu } from '~/components/home/quick-menu';
+import { SECTIONS } from '~/components/home/sections-data';
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const t = await localize(request, 'welcome');
-  return { t };
-};
-
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
-  const { t } = data;
-  return [{ title: t.meta.title }, { name: 'description', content: t.meta.description }];
-};
+export const meta: MetaFunction = () => [
+  { title: '운결 | AI 사주 & 운세' },
+  {
+    name: 'description',
+    content: 'AI가 풀어주는 사주, 운세, 타로, 궁합. 나의 운명을 지금 확인하세요.',
+  },
+];
 
 export default function Home() {
-  const { t } = useLoaderData<typeof loader>();
-  const [language, setLanguage] = useLanguage();
-  const [theme, setTheme] = useTheme();
-
   return (
-    <div className="flex h-screen flex-col items-center justify-center">
-      {theme === Theme.dark ? (
-        <LogoDark className="mb-8 h-auto w-40" />
-      ) : (
-        <LogoLight className="mb-8 h-auto w-40" />
-      )}
-      <div className="flex w-full max-w-md flex-col rounded-2xl border p-10">
-        <div>
-          <h1 className="text-xl font-bold">{t.welcome}</h1>
-        </div>
-        <div className="space-y-4">
-          <div className="flex flex-col justify-center gap-2">
-            <div className="flex items-center gap-2">
-              <label className="text-lg">{t.word.theme}:</label>
-              <p className="text-lg">{theme}</p>
-            </div>
-            <Button
-              className="w-24"
-              onClick={() => setTheme(theme === Theme.dark ? Theme.light : Theme.dark)}
-            >
-              {theme === Theme.dark ? Theme.light : Theme.dark}
-            </Button>
-          </div>
-          <div className="flex flex-col justify-center gap-2">
-            <div className="flex items-center gap-2">
-              <label className="text-lg">{t.word.language}:</label>
-              <p className="text-lg">{language}</p>
-            </div>
-            <Button
-              className="w-24"
-              onClick={() =>
-                setLanguage(language === Language.en ? Language.ko : Language.en)
-              }
-            >
-              {language === Language.en ? Language.ko : Language.en}
-            </Button>
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen bg-background text-foreground">
+      <Hero />
+      <QuickMenu />
+      <main className="mx-auto max-w-7xl space-y-10 px-4 py-10 sm:space-y-12 sm:py-16">
+        <AiSajuBanner />
+        {SECTIONS.map((section) => (
+          <ContentSection key={section.id} {...section} />
+        ))}
+        <AiBanner />
+      </main>
     </div>
   );
 }
