@@ -69,10 +69,10 @@
   "packageManager": "yarn@4.9.2",
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
-      "eslint --fix"
+      "node --max-old-space-size=4096 node_modules/.bin/eslint --fix --cache"
     ],
     "*": [
-      "prettier --write"
+      "prettier --write --ignore-unknown"
     ]
   },
   "simple-git-hooks": {
