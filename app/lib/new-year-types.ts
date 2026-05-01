@@ -14,13 +14,13 @@ export interface NewYearCalcResponse {
 }
 
 export interface NewYearAiInterpretation {
-  overview: string;   // 올해 총운
-  wealth: string;     // 재물운
-  love: string;       // 연애·관계운
-  career: string;     // 직업·사업운
-  health: string;     // 건강운
-  monthly: string[];  // 12개월 운세 (index 0 = 1월)
-  advice: string;     // 올해의 조언
+  overview: string; // 올해 총운
+  wealth: string; // 재물운
+  love: string; // 연애·관계운
+  career: string; // 직업·사업운
+  health: string; // 건강운
+  monthly: string[]; // 12개월 운세 (index 0 = 1월)
+  advice: string; // 올해의 조언
 }
 
 export interface NewYearAiResponse {

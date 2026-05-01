@@ -1,28 +1,21 @@
 import type { DaeunPeriod } from './lifetime-types';
-import {
-  CG,
-  CG_HANJA,
-  CG_OHAENG,
-  JJ,
-  JJ_HANJA,
-  JJ_OHAENG,
-} from './saju-calc';
+import { CG, CG_HANJA, CG_OHAENG, JJ, JJ_HANJA, JJ_OHAENG } from './saju-calc';
 
 // ─── 절기 근사 날짜 (양력) ─────────────────────────────────
 // 소한·입춘·경칩·청명·입하·망종·소서·입추·백로·한로·입동·대설
 const JEOLGI: Array<{ month: number; day: number }> = [
-  { month: 1,  day: 6  }, // 소한
-  { month: 2,  day: 4  }, // 입춘
-  { month: 3,  day: 6  }, // 경칩
-  { month: 4,  day: 5  }, // 청명
-  { month: 5,  day: 6  }, // 입하
-  { month: 6,  day: 6  }, // 망종
-  { month: 7,  day: 7  }, // 소서
-  { month: 8,  day: 8  }, // 입추
-  { month: 9,  day: 8  }, // 백로
-  { month: 10, day: 8  }, // 한로
-  { month: 11, day: 7  }, // 입동
-  { month: 12, day: 7  }, // 대설
+  { month: 1, day: 6 }, // 소한
+  { month: 2, day: 4 }, // 입춘
+  { month: 3, day: 6 }, // 경칩
+  { month: 4, day: 5 }, // 청명
+  { month: 5, day: 6 }, // 입하
+  { month: 6, day: 6 }, // 망종
+  { month: 7, day: 7 }, // 소서
+  { month: 8, day: 8 }, // 입추
+  { month: 9, day: 8 }, // 백로
+  { month: 10, day: 8 }, // 한로
+  { month: 11, day: 7 }, // 입동
+  { month: 12, day: 7 }, // 대설
 ];
 
 function getJeolgiDatesForYear(year: number): Date[] {
@@ -32,10 +25,7 @@ function getJeolgiDatesForYear(year: number): Date[] {
 /** 생일 이후 가장 가까운 절기까지의 일수 (순행용) */
 function daysToNextJeolgi(birthDate: Date): number {
   const y = birthDate.getUTCFullYear();
-  const candidates = [
-    ...getJeolgiDatesForYear(y),
-    ...getJeolgiDatesForYear(y + 1),
-  ];
+  const candidates = [...getJeolgiDatesForYear(y), ...getJeolgiDatesForYear(y + 1)];
   for (const d of candidates) {
     if (d > birthDate) {
       return Math.round((d.getTime() - birthDate.getTime()) / 86_400_000);
@@ -47,10 +37,7 @@ function daysToNextJeolgi(birthDate: Date): number {
 /** 생일 이전 가장 가까운 절기까지의 일수 (역행용) */
 function daysToPrevJeolgi(birthDate: Date): number {
   const y = birthDate.getUTCFullYear();
-  const candidates = [
-    ...getJeolgiDatesForYear(y - 1),
-    ...getJeolgiDatesForYear(y),
-  ];
+  const candidates = [...getJeolgiDatesForYear(y - 1), ...getJeolgiDatesForYear(y)];
   for (let i = candidates.length - 1; i >= 0; i--) {
     if (candidates[i] <= birthDate) {
       return Math.round((birthDate.getTime() - candidates[i].getTime()) / 86_400_000);
@@ -88,15 +75,12 @@ export function calcDaeun(
   const isYangYear = yearCGIdx % 2 === 0;
 
   // 2. 방향: 양남/음녀 → 순행, 음남/양녀 → 역행
-  const isForward =
-    (gender === '남' && isYangYear) || (gender === '여' && !isYangYear);
+  const isForward = (gender === '남' && isYangYear) || (gender === '여' && !isYangYear);
   const direction: '순행' | '역행' = isForward ? '순행' : '역행';
 
   // 3. 대운 시작 나이
   const birthDate = new Date(Date.UTC(birthYear, birthMonth - 1, birthDay));
-  const days = isForward
-    ? daysToNextJeolgi(birthDate)
-    : daysToPrevJeolgi(birthDate);
+  const days = isForward ? daysToNextJeolgi(birthDate) : daysToPrevJeolgi(birthDate);
   const daeunStartAge = Math.max(1, Math.round(days / 3));
 
   // 4. 월주의 60갑자 인덱스
@@ -114,7 +98,7 @@ export function calcDaeun(
 
     const idx60 = isForward
       ? (month60Idx + 1 + i) % 60
-      : ((month60Idx - 1 - i) % 60 + 60) % 60;
+      : (((month60Idx - 1 - i) % 60) + 60) % 60;
 
     const cgIdx = idx60 % 10;
     const jjIdx = idx60 % 12;
